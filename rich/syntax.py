@@ -267,14 +267,7 @@ class Syntax(JupyterMixin):
     @classmethod
     def get_theme(cls, name: Union[str, SyntaxTheme]) -> SyntaxTheme:
         """Get a syntax theme instance."""
-        if isinstance(name, SyntaxTheme):
-            return name
-        theme: SyntaxTheme
-        if name in RICH_SYNTAX_THEMES:
-            theme = ANSISyntaxTheme(RICH_SYNTAX_THEMES[name])
-        else:
-            theme = PygmentsSyntaxTheme(name)
-        return theme
+        pass
 
     def __init__(
         self,
@@ -357,27 +350,7 @@ class Syntax(JupyterMixin):
         Returns:
             [Syntax]: A Syntax object that may be printed to the console
         """
-        code = Path(path).read_text(encoding=encoding)
-
-        if not lexer:
-            lexer = cls.guess_lexer(path, code=code)
-
-        return cls(
-            code,
-            lexer,
-            theme=theme,
-            dedent=dedent,
-            line_numbers=line_numbers,
-            line_range=line_range,
-            start_line=start_line,
-            highlight_lines=highlight_lines,
-            code_width=code_width,
-            tab_size=tab_size,
-            word_wrap=word_wrap,
-            background_color=background_color,
-            indent_guides=indent_guides,
-            padding=padding,
-        )
+        pass
 
     @classmethod
     def guess_lexer(cls, path: str, code: Optional[str] = None) -> str:
@@ -396,30 +369,7 @@ class Syntax(JupyterMixin):
         Returns:
             str: The name of the Pygments lexer that best matches the supplied path/code.
         """
-        lexer: Optional[Lexer] = None
-        lexer_name = "default"
-        if code:
-            try:
-                lexer = guess_lexer_for_filename(path, code)
-            except ClassNotFound:
-                pass
-
-        if not lexer:
-            try:
-                _, ext = os.path.splitext(path)
-                if ext:
-                    extension = ext.lstrip(".").lower()
-                    lexer = get_lexer_by_name(extension)
-            except ClassNotFound:
-                pass
-
-        if lexer:
-            if lexer.aliases:
-                lexer_name = lexer.aliases[0]
-            else:
-                lexer_name = lexer.name
-
-        return lexer_name
+        pass
 
     def _get_base_style(self) -> Style:
         """Get the base style."""
@@ -444,28 +394,12 @@ class Syntax(JupyterMixin):
 
         Tries to find the lexer by name if a string was passed to the constructor.
         """
-
-        if isinstance(self._lexer, Lexer):
-            return self._lexer
-        try:
-            return get_lexer_by_name(
-                self._lexer,
-                stripnl=False,
-                ensurenl=True,
-                tabsize=self.tab_size,
-            )
-        except ClassNotFound:
-            return None
+        pass
 
     @property
     def default_lexer(self) -> Lexer:
         """A Pygments Lexer to use if one is not specified or invalid."""
-        return get_lexer_by_name(
-            "text",
-            stripnl=False,
-            ensurenl=True,
-            tabsize=self.tab_size,
-        )
+        pass
 
     def highlight(
         self,
@@ -591,13 +525,7 @@ class Syntax(JupyterMixin):
     @property
     def _numbers_column_width(self) -> int:
         """Get the number of characters used to render the numbers column."""
-        column_width = 0
-        if self.line_numbers:
-            column_width = (
-                len(str(self.start_line + self.code.count("\n")))
-                + NUMBERS_COLUMN_DEFAULT_PADDING
-            )
-        return column_width
+        pass
 
     def _get_number_styles(self, console: Console) -> Tuple[Style, Style, Style]:
         """Get background, number, and highlight styles for line numbers."""

@@ -339,12 +339,12 @@ class Color(NamedTuple):
     @property
     def is_system_defined(self) -> bool:
         """Check if the color is ultimately defined by the system."""
-        return self.system not in (ColorSystem.EIGHT_BIT, ColorSystem.TRUECOLOR)
+        pass
 
     @property
     def is_default(self) -> bool:
         """Check if the color is a default color."""
-        return self.type == ColorType.DEFAULT
+        pass
 
     def get_truecolor(
         self, theme: Optional["TerminalTheme"] = None, foreground: bool = True

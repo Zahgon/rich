@@ -43,11 +43,7 @@ def reconfigure(*args: Any, **kwargs: Any) -> None:
         *args (Any): Positional arguments for the replacement :class:`~rich.console.Console`.
         **kwargs (Any): Keyword arguments for the replacement :class:`~rich.console.Console`.
     """
-    from rich.console import Console
-
-    new_console = Console(*args, **kwargs)
-    _console = get_console()
-    _console.__dict__ = new_console.__dict__
+    pass
 
 
 def print(
@@ -68,10 +64,7 @@ def print(
         flush (bool, optional): Has no effect as Rich always flushes output. Defaults to False.
 
     """
-    from .console import Console
-
-    write_console = get_console() if file is None else Console(file=file)
-    return write_console.print(*objects, sep=sep, end=end)
+    pass
 
 
 def print_json(

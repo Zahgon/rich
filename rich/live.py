@@ -31,11 +31,6 @@ class _RefreshThread(Thread):
     def stop(self) -> None:
         self.done.set()
 
-    def run(self) -> None:
-        while not self.done.wait(1 / self.refresh_per_second):
-            with self.live._lock:
-                if not self.done.is_set():
-                    self.live.refresh()
 
 
 class Live(JupyterMixin, RenderHook):
@@ -98,7 +93,7 @@ class Live(JupyterMixin, RenderHook):
     @property
     def is_started(self) -> bool:
         """Check if live display has been started."""
-        return self._started
+        pass
 
     def get_renderable(self) -> RenderableType:
         renderable = (
@@ -218,14 +213,7 @@ class Live(JupyterMixin, RenderHook):
         Returns:
             RenderableType: Displayed renderable.
         """
-        live_stack = self.console._live_stack
-        renderable: RenderableType
-        if live_stack and self is live_stack[0]:
-            # The first Live instance will render everything in the Live stack
-            renderable = Group(*[live.get_renderable() for live in live_stack])
-        else:
-            renderable = self.get_renderable()
-        return Screen(renderable) if self._alt_screen else renderable
+        pass
 
     def update(self, renderable: RenderableType, *, refresh: bool = False) -> None:
         """Update the renderable that is being displayed

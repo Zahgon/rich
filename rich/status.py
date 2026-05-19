@@ -41,14 +41,11 @@ class Status(JupyterMixin):
             transient=True,
         )
 
-    @property
-    def renderable(self) -> Spinner:
-        return self._spinner
 
     @property
     def console(self) -> "Console":
         """Get the Console used by the Status objects."""
-        return self._live.console
+        pass
 
     def update(
         self,

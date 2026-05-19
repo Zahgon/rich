@@ -22,15 +22,6 @@ class JupyterRenderable:
         self.html = html
         self.text = text
 
-    def _repr_mimebundle_(
-        self, include: Sequence[str], exclude: Sequence[str], **kwargs: Any
-    ) -> Dict[str, str]:
-        data = {"text/plain": self.text, "text/html": self.html}
-        if include:
-            data = {k: v for (k, v) in data.items() if k in include}
-        if exclude:
-            data = {k: v for (k, v) in data.items() if k not in exclude}
-        return data
 
 
 class JupyterMixin:
@@ -38,22 +29,6 @@ class JupyterMixin:
 
     __slots__ = ()
 
-    def _repr_mimebundle_(
-        self: "ConsoleRenderable",
-        include: Sequence[str],
-        exclude: Sequence[str],
-        **kwargs: Any,
-    ) -> Dict[str, str]:
-        console = get_console()
-        segments = list(console.render(self, console.options))
-        html = _render_segments(segments)
-        text = console._render_buffer(segments)
-        data = {"text/plain": text, "text/html": html}
-        if include:
-            data = {k: v for (k, v) in data.items() if k in include}
-        if exclude:
-            data = {k: v for (k, v) in data.items() if k not in exclude}
-        return data
 
 
 def _render_segments(segments: Iterable[Segment]) -> str:
@@ -97,5 +72,4 @@ def display(segments: Iterable[Segment], text: str) -> None:
 
 def print(*args: Any, **kwargs: Any) -> None:
     """Proxy for Console print."""
-    console = get_console()
-    return console.print(*args, **kwargs)
+    pass

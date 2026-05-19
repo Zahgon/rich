@@ -68,7 +68,7 @@ class Control:
     @classmethod
     def bell(cls) -> "Control":
         """Ring the 'bell'."""
-        return cls(ControlType.BELL)
+        pass
 
     @classmethod
     def home(cls) -> "Control":
@@ -87,22 +87,7 @@ class Control:
             ~Control: Control object.
 
         """
-
-        def get_codes() -> Iterable[ControlCode]:
-            control = ControlType
-            if x:
-                yield (
-                    control.CURSOR_FORWARD if x > 0 else control.CURSOR_BACKWARD,
-                    abs(x),
-                )
-            if y:
-                yield (
-                    control.CURSOR_DOWN if y > 0 else control.CURSOR_UP,
-                    abs(y),
-                )
-
-        control = cls(*get_codes())
-        return control
+        pass
 
     @classmethod
     def move_to_column(cls, x: int, y: int = 0) -> "Control":
@@ -115,18 +100,7 @@ class Control:
         Returns:
             ~Control: Control object.
         """
-
-        return (
-            cls(
-                (ControlType.CURSOR_MOVE_TO_COLUMN, x),
-                (
-                    ControlType.CURSOR_DOWN if y > 0 else ControlType.CURSOR_UP,
-                    abs(y),
-                ),
-            )
-            if y
-            else cls((ControlType.CURSOR_MOVE_TO_COLUMN, x))
-        )
+        pass
 
     @classmethod
     def move_to(cls, x: int, y: int) -> "Control":
@@ -166,7 +140,7 @@ class Control:
         Args:
             title (str): The new terminal window title
         """
-        return cls((ControlType.SET_WINDOW_TITLE, title))
+        pass
 
     def __str__(self) -> str:
         return self.segment.text

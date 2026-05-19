@@ -485,7 +485,7 @@ class MarkdownContext:
     @property
     def current_style(self) -> Style:
         """Current style which is the product of all styles on the stack."""
-        return self.style_stack.current
+        pass
 
     def on_text(self, text: str, node_type: str) -> None:
         """Called when the parser visits text."""

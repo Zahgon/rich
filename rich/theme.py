@@ -29,10 +29,7 @@ class Theme:
     @property
     def config(self) -> str:
         """Get contents of a config file for this theme."""
-        config = "[styles]\n" + "\n".join(
-            f"{name} = {style}" for name, style in sorted(self.styles.items())
-        )
-        return config
+        pass
 
     @classmethod
     def from_file(
@@ -48,13 +45,7 @@ class Theme:
         Returns:
             Theme: A New theme instance.
         """
-        import configparser
-
-        config = configparser.ConfigParser()
-        config.read_file(config_file, source=source)
-        styles = {name: Style.parse(value) for name, value in config.items("styles")}
-        theme = Theme(styles, inherit=inherit)
-        return theme
+        pass
 
     @classmethod
     def read(
@@ -70,8 +61,7 @@ class Theme:
         Returns:
             Theme: A new theme instance.
         """
-        with open(path, encoding=encoding) as config_file:
-            return cls.from_file(config_file, source=path, inherit=inherit)
+        pass
 
 
 class ThemeStackError(Exception):
@@ -96,19 +86,11 @@ class ThemeStack:
             theme (Theme): A Theme instance.
             inherit (boolean, optional): Inherit styles from current top of stack.
         """
-        styles: Dict[str, Style]
-        styles = (
-            {**self._entries[-1], **theme.styles} if inherit else theme.styles.copy()
-        )
-        self._entries.append(styles)
-        self.get = self._entries[-1].get
+        pass
 
     def pop_theme(self) -> None:
         """Pop (and discard) the top-most theme."""
-        if len(self._entries) == 1:
-            raise ThemeStackError("Unable to pop base theme")
-        self._entries.pop()
-        self.get = self._entries[-1].get
+        pass
 
 
 if __name__ == "__main__":  # pragma: no cover

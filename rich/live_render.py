@@ -36,9 +36,7 @@ class LiveRender:
         Returns:
             Height in lines
         """
-        if self._shape is None:
-            return 0
-        return self._shape[1]
+        pass
 
     def set_renderable(self, renderable: RenderableType) -> None:
         """Set a new renderable.

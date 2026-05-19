@@ -142,7 +142,7 @@ class ConsoleOptions:
     @property
     def ascii_only(self) -> bool:
         """Check if renderables should use ascii only."""
-        return not self.encoding.startswith("utf")
+        pass
 
     def copy(self) -> "ConsoleOptions":
         """Return a copy of the options.
@@ -460,11 +460,6 @@ class Group:
         self.fit = fit
         self._render: Optional[List[RenderableType]] = None
 
-    @property
-    def renderables(self) -> List["RenderableType"]:
-        if self._render is None:
-            self._render = list(self._renderables)
-        return self._render
 
     def __rich_measure__(
         self, console: "Console", options: "ConsoleOptions"
@@ -491,35 +486,14 @@ def group(fit: bool = True) -> Callable[..., Callable[..., Group]]:
         method: Callable[..., Iterable[RenderableType]],
     ) -> Callable[..., Group]:
         """Convert a method that returns an iterable of renderables in to a Group."""
-
-        @wraps(method)
-        def _replace(*args: Any, **kwargs: Any) -> Group:
-            renderables = method(*args, **kwargs)
-            return Group(*renderables, fit=fit)
-
-        return _replace
+        pass
 
     return decorator
 
 
 def _is_jupyter() -> bool:  # pragma: no cover
     """Check if we're running in a Jupyter notebook."""
-    try:
-        get_ipython  # type: ignore[name-defined]
-    except NameError:
-        return False
-    ipython = get_ipython()  # type: ignore[name-defined]
-    shell = ipython.__class__.__name__
-    if (
-        "google.colab" in str(ipython.__class__)
-        or os.getenv("DATABRICKS_RUNTIME_VERSION")
-        or shell == "ZMQInteractiveShell"
-    ):
-        return True  # Jupyter notebook or qtconsole
-    elif shell == "TerminalInteractiveShell":
-        return False  # Terminal running IPython
-    else:
-        return False  # Other type (?)
+    pass
 
 
 COLOR_SYSTEMS = {
@@ -575,7 +549,7 @@ def get_windows_console_features() -> "WindowsConsoleFeatures":  # pragma: no co
 
 def detect_legacy_windows() -> bool:
     """Detect legacy Windows."""
-    return WINDOWS and not get_windows_console_features().vt
+    pass
 
 
 class Console:
@@ -756,68 +730,40 @@ class Console:
     @property
     def file(self) -> IO[str]:
         """Get the file object to write to."""
-        file = self._file or (sys.stderr if self.stderr else sys.stdout)
-        file = getattr(file, "rich_proxied_file", file)
-        if file is None:
-            file = NULL_FILE
-        return file
+        pass
 
     @file.setter
     def file(self, new_file: IO[str]) -> None:
         """Set a new file object."""
-        self._file = new_file
+        pass
 
     @property
     def _buffer(self) -> List[Segment]:
         """Get a thread local buffer."""
-        return self._thread_locals.buffer
+        pass
 
     @property
     def _buffer_index(self) -> int:
         """Get a thread local buffer."""
-        return self._thread_locals.buffer_index
+        pass
 
-    @_buffer_index.setter
-    def _buffer_index(self, value: int) -> None:
-        self._thread_locals.buffer_index = value
 
     @property
     def _theme_stack(self) -> ThemeStack:
         """Get the thread local theme stack."""
-        return self._thread_locals.theme_stack
+        pass
 
     def _detect_color_system(self) -> Optional[ColorSystem]:
         """Detect color system from env vars."""
-        if self.is_jupyter:
-            return ColorSystem.TRUECOLOR
-        if not self.is_terminal or self.is_dumb_terminal:
-            return None
-        if WINDOWS:  # pragma: no cover
-            if self.legacy_windows:  # pragma: no cover
-                return ColorSystem.WINDOWS
-            windows_console_features = get_windows_console_features()
-            return (
-                ColorSystem.TRUECOLOR
-                if windows_console_features.truecolor
-                else ColorSystem.EIGHT_BIT
-            )
-        else:
-            color_term = self._environ.get("COLORTERM", "").strip().lower()
-            if color_term in ("truecolor", "24bit"):
-                return ColorSystem.TRUECOLOR
-            term = self._environ.get("TERM", "").strip().lower()
-            _term_name, _hyphen, colors = term.rpartition("-")
-            color_system = _TERM_COLORS.get(colors, ColorSystem.STANDARD)
-            return color_system
+        pass
 
     def _enter_buffer(self) -> None:
         """Enter in to a buffer context, and buffer all output."""
-        self._buffer_index += 1
+        pass
 
     def _exit_buffer(self) -> None:
         """Leave buffer context, and render content if required."""
-        self._buffer_index -= 1
-        self._check_buffer()
+        pass
 
     def set_live(self, live: "Live") -> bool:
         """Set Live instance. Used by Live context manager (no need to call directly).
@@ -865,7 +811,7 @@ class Console:
 
     def begin_capture(self) -> None:
         """Begin capturing console output. Call :meth:`end_capture` to exit capture mode and return output."""
-        self._enter_buffer()
+        pass
 
     def end_capture(self) -> str:
         """End capture mode and return captured string.
@@ -873,10 +819,7 @@ class Console:
         Returns:
             str: Console output.
         """
-        render_result = self._render_buffer(self._buffer)
-        del self._buffer[:]
-        self._exit_buffer()
-        return render_result
+        pass
 
     def push_theme(self, theme: Theme, *, inherit: bool = True) -> None:
         """Push a new theme on to the top of the stack, replacing the styles from the previous theme.
@@ -887,11 +830,11 @@ class Console:
             theme (Theme): A theme instance.
             inherit (bool, optional): Inherit existing styles. Defaults to True.
         """
-        self._theme_stack.push_theme(theme, inherit=inherit)
+        pass
 
     def pop_theme(self) -> None:
         """Remove theme from top of stack, restoring previous theme."""
-        self._theme_stack.pop_theme()
+        pass
 
     def use_theme(self, theme: Theme, *, inherit: bool = True) -> ThemeContext:
         """Use a different theme for the duration of the context manager.
@@ -912,11 +855,7 @@ class Console:
         Returns:
             Optional[str]: "standard", "256" or "truecolor".
         """
-
-        if self._color_system is not None:
-            return _COLOR_SYSTEMS_NAMES[self._color_system]
-        else:
-            return None
+        pass
 
     @property
     def encoding(self) -> str:
@@ -925,7 +864,7 @@ class Console:
         Returns:
             str: A standard encoding string.
         """
-        return (getattr(self.file, "encoding", "utf-8") or "utf-8").lower()
+        pass
 
     @property
     def is_terminal(self) -> bool:
@@ -935,45 +874,7 @@ class Console:
             bool: True if the console writing to a device capable of
                 understanding escape sequences, otherwise False.
         """
-        # If dev has explicitly set this value, return it
-        if self._force_terminal is not None:
-            return self._force_terminal
-
-        # Fudge for Idle
-        if hasattr(sys.stdin, "__module__") and sys.stdin.__module__.startswith(
-            "idlelib"
-        ):
-            # Return False for Idle which claims to be a tty but can't handle ansi codes
-            return False
-
-        if self.is_jupyter:
-            # return False for Jupyter, which may have FORCE_COLOR set
-            return False
-
-        environ = self._environ
-
-        tty_compatible = environ.get("TTY_COMPATIBLE", "")
-        # 0 indicates device is not tty compatible
-        if tty_compatible == "0":
-            return False
-        # 1 indicates device is tty compatible
-        if tty_compatible == "1":
-            return True
-
-        # https://force-color.org/
-        force_color = environ.get("FORCE_COLOR")
-        if force_color is not None:
-            return force_color != ""
-
-        # Any other value defaults to auto detect
-        isatty: Optional[Callable[[], bool]] = getattr(self.file, "isatty", None)
-        try:
-            return False if isatty is None else isatty()
-        except ValueError:
-            # in some situation (at the end of a pytest run for example) isatty() can raise
-            # ValueError: I/O operation on closed file
-            # return False because we aren't in a terminal anymore
-            return False
+        pass
 
     @property
     def is_dumb_terminal(self) -> bool:
@@ -983,23 +884,12 @@ class Console:
             bool: True if writing to a dumb terminal, otherwise False.
 
         """
-        _term = self._environ.get("TERM", "")
-        is_dumb = _term.lower() in ("dumb", "unknown")
-        return self.is_terminal and is_dumb
+        pass
 
     @property
     def options(self) -> ConsoleOptions:
         """Get default console options."""
-        size = self.size
-        return ConsoleOptions(
-            max_height=size.height,
-            size=size,
-            legacy_windows=self.legacy_windows,
-            min_width=1,
-            max_width=size.width,
-            encoding=self.encoding,
-            is_terminal=self.is_terminal,
-        )
+        pass
 
     @property
     def size(self) -> ConsoleDimensions:
@@ -1008,39 +898,7 @@ class Console:
         Returns:
             ConsoleDimensions: A named tuple containing the dimensions.
         """
-
-        if self._width is not None and self._height is not None:
-            return ConsoleDimensions(self._width - self.legacy_windows, self._height)
-
-        if self.is_dumb_terminal:
-            return ConsoleDimensions(80, 25)
-
-        width: Optional[int] = None
-        height: Optional[int] = None
-
-        streams = _STD_STREAMS_OUTPUT if WINDOWS else _STD_STREAMS
-        for file_descriptor in streams:
-            try:
-                width, height = os.get_terminal_size(file_descriptor)
-            except (AttributeError, ValueError, OSError):  # Probably not a terminal
-                pass
-            else:
-                break
-
-        columns = self._environ.get("COLUMNS")
-        if columns is not None and columns.isdigit():
-            width = int(columns)
-        lines = self._environ.get("LINES")
-        if lines is not None and lines.isdigit():
-            height = int(lines)
-
-        # get_terminal_size can report 0, 0 if run from pseudo-terminal
-        width = width or 80
-        height = height or 25
-        return ConsoleDimensions(
-            width - self.legacy_windows if self._width is None else self._width,
-            height if self._height is None else self._height,
-        )
+        pass
 
     @size.setter
     def size(self, new_size: Tuple[int, int]) -> None:
@@ -1049,9 +907,7 @@ class Console:
         Args:
             new_size (Tuple[int, int]): New width and height.
         """
-        width, height = new_size
-        self._width = width
-        self._height = height
+        pass
 
     @property
     def width(self) -> int:
@@ -1060,7 +916,7 @@ class Console:
         Returns:
             int: The width (in characters) of the console.
         """
-        return self.size.width
+        pass
 
     @width.setter
     def width(self, width: int) -> None:
@@ -1069,7 +925,7 @@ class Console:
         Args:
             width (int): New width.
         """
-        self._width = width
+        pass
 
     @property
     def height(self) -> int:
@@ -1078,7 +934,7 @@ class Console:
         Returns:
             int: The height (in lines) of the console.
         """
-        return self.size.height
+        pass
 
     @height.setter
     def height(self, height: int) -> None:
@@ -1087,11 +943,11 @@ class Console:
         Args:
             height (int): new height.
         """
-        self._height = height
+        pass
 
     def bell(self) -> None:
         """Play a 'bell' sound (if supported by the terminal)."""
-        self.control(Control.bell())
+        pass
 
     def capture(self) -> Capture:
         """A context manager to *capture* the result of print() or log() in a string,
@@ -1131,7 +987,7 @@ class Console:
         Returns:
             PagerContext: A context manager.
         """
-        return PagerContext(self, pager=pager, styles=styles, links=links)
+        pass
 
     def line(self, count: int = 1) -> None:
         """Write new line(s).
@@ -1175,17 +1031,7 @@ class Console:
         Returns:
             Status: A Status object that may be used as a context manager.
         """
-        from .status import Status
-
-        status_renderable = Status(
-            status,
-            console=self,
-            spinner=spinner,
-            spinner_style=spinner_style,
-            speed=speed,
-            refresh_per_second=refresh_per_second,
-        )
-        return status_renderable
+        pass
 
     def show_cursor(self, show: bool = True) -> bool:
         """Show or hide the cursor.
@@ -1226,7 +1072,7 @@ class Console:
         Returns:
             bool: True if the alt screen was enabled, otherwise False.
         """
-        return self._is_alt_screen
+        pass
 
     def set_window_title(self, title: str) -> bool:
         """Set the title of the console terminal window.
@@ -1255,10 +1101,7 @@ class Console:
                 does not guarantee that the window title has actually changed,
                 since the feature may be unsupported/disabled in some terminals.
         """
-        if self.is_terminal:
-            self.control(Control.title(title))
-            return True
-        return False
+        pass
 
     def screen(
         self, hide_cursor: bool = True, style: Optional[StyleType] = None
@@ -1272,7 +1115,7 @@ class Console:
         Returns:
             ~ScreenContext: Context which enables alternate screen on enter, and disables it on exit.
         """
-        return ScreenContext(self, hide_cursor=hide_cursor, style=style or "")
+        pass
 
     def measure(
         self, renderable: RenderableType, *, options: Optional[ConsoleOptions] = None
@@ -1538,8 +1381,6 @@ class Console:
         append = _append
         if justify in ("left", "center", "right"):
 
-            def align_append(renderable: RenderableType) -> None:
-                _append(Align(renderable, cast(AlignMethod, justify)))
 
             append = align_append
 
@@ -1636,18 +1477,7 @@ class Console:
             highlight (Optional[bool], optional): Enable automatic highlighting, or ``None`` to use
                 console default. Defaults to ``None``.
         """
-        raw_output: str = sep.join(str(_object) for _object in objects)
-        self.print(
-            raw_output,
-            style=style,
-            highlight=highlight,
-            emoji=False,
-            markup=False,
-            no_wrap=True,
-            overflow="ignore",
-            crop=False,
-            end=end,
-        )
+        pass
 
     def print(
         self,
@@ -1686,74 +1516,7 @@ class Console:
                 Console default. Defaults to ``None``.
             new_line_start (bool, False): Insert a new line at the start if the output contains more than one line. Defaults to ``False``.
         """
-        if not objects:
-            if end == "\n":
-                objects = (NewLine(),)
-            else:
-                objects = ("",)
-
-        if soft_wrap is None:
-            soft_wrap = self.soft_wrap
-        if soft_wrap:
-            if no_wrap is None:
-                no_wrap = True
-            if overflow is None:
-                overflow = "ignore"
-            crop = False
-        render_hooks = self._render_hooks[:]
-        with self:
-            renderables = self._collect_renderables(
-                objects,
-                sep,
-                end,
-                justify=justify,
-                emoji=emoji,
-                markup=markup,
-                highlight=highlight,
-            )
-            for hook in render_hooks:
-                renderables = hook.process_renderables(renderables)
-            render_options = self.options.update(
-                justify=justify,
-                overflow=overflow,
-                width=min(width, self.width) if width is not None else NO_CHANGE,
-                height=height,
-                no_wrap=no_wrap,
-                markup=markup,
-                highlight=highlight,
-            )
-
-            new_segments: List[Segment] = []
-            extend = new_segments.extend
-            render = self.render
-            if style is None:
-                for renderable in renderables:
-                    extend(render(renderable, render_options))
-            else:
-                render_style = self.get_style(style)
-                new_line = Segment.line()
-                for renderable in renderables:
-                    for line, add_new_line in Segment.split_lines_terminator(
-                        render(renderable, render_options)
-                    ):
-                        extend(Segment.apply_style(line, render_style))
-                        if add_new_line:
-                            new_segments.append(new_line)
-
-            if new_line_start:
-                if (
-                    len("".join(segment.text for segment in new_segments).splitlines())
-                    > 1
-                ):
-                    new_segments.insert(0, Segment.line())
-            if crop:
-                buffer_extend = self._buffer.extend
-                for line in Segment.split_and_crop_lines(
-                    new_segments, self.width, pad=False
-                ):
-                    buffer_extend(line)
-            else:
-                self._buffer.extend(new_segments)
+        pass
 
     def print_json(
         self,
@@ -1835,20 +1598,7 @@ class Console:
             errors.NoAltScreen: If the Console isn't in alt screen mode.
 
         """
-        if not self.is_alt_screen:
-            raise errors.NoAltScreen("Alt screen must be enabled to call update_screen")
-        render_options = options or self.options
-        if region is None:
-            x = y = 0
-            render_options = render_options.update_dimensions(
-                render_options.max_width, render_options.height or self.height
-            )
-        else:
-            x, y, width, height = region
-            render_options = render_options.update_dimensions(width, height)
-
-        lines = self.render_lines(renderable, options=render_options)
-        self.update_screen_lines(lines, x, y)
+        pass
 
     def update_screen_lines(
         self, lines: List[List[Segment]], x: int = 0, y: int = 0
@@ -1863,12 +1613,7 @@ class Console:
         Raises:
             errors.NoAltScreen: If the Console isn't in alt screen mode.
         """
-        if not self.is_alt_screen:
-            raise errors.NoAltScreen("Alt screen must be enabled to call update_screen")
-        screen_update = ScreenUpdate(lines, x, y)
-        segments = self.render(screen_update)
-        self._buffer.extend(segments)
-        self._check_buffer()
+        pass
 
     def print_exception(
         self,
@@ -2036,10 +1781,7 @@ class Console:
 
         See https://docs.python.org/3/library/signal.html#note-on-sigpipe for details.
         """
-        self.quiet = True
-        devnull = os.open(os.devnull, os.O_WRONLY)
-        os.dup2(devnull, sys.stdout.fileno())
-        raise SystemExit(1)
+        pass
 
     def _check_buffer(self) -> None:
         """Check if the buffer may be rendered. Render it if it can (e.g. Console.quiet is False)
@@ -2047,111 +1789,15 @@ class Console:
         legacy Windows consoles, the win32 API is called directly.
         This method will also record what it renders if recording is enabled via Console.record.
         """
-        if self.quiet:
-            del self._buffer[:]
-            return
-
-        try:
-            self._write_buffer()
-        except BrokenPipeError:
-            self.on_broken_pipe()
+        pass
 
     def _write_buffer(self) -> None:
         """Write the buffer to the output file."""
-
-        with self._lock:
-            if self.record and not self._buffer_index:
-                with self._record_buffer_lock:
-                    self._record_buffer.extend(self._buffer[:])
-
-            if self._buffer_index == 0:
-                if self.is_jupyter:  # pragma: no cover
-                    from .jupyter import display
-
-                    display(self._buffer, self._render_buffer(self._buffer[:]))
-                    del self._buffer[:]
-                else:
-                    if WINDOWS:
-                        use_legacy_windows_render = False
-                        if self.legacy_windows:
-                            fileno = get_fileno(self.file)
-                            if fileno is not None:
-                                use_legacy_windows_render = (
-                                    fileno in _STD_STREAMS_OUTPUT
-                                )
-
-                        if use_legacy_windows_render:
-                            from rich._win32_console import LegacyWindowsTerm
-                            from rich._windows_renderer import legacy_windows_render
-
-                            buffer = self._buffer[:]
-                            if self.no_color and self._color_system:
-                                buffer = list(Segment.remove_color(buffer))
-
-                            legacy_windows_render(buffer, LegacyWindowsTerm(self.file))
-                        else:
-                            # Either a non-std stream on legacy Windows, or modern Windows.
-                            text = self._render_buffer(self._buffer[:])
-                            # https://bugs.python.org/issue37871
-                            # https://github.com/python/cpython/issues/82052
-                            # We need to avoid writing more than 32Kb in a single write, due to the above bug
-                            write = self.file.write
-                            # Worse case scenario, every character is 4 bytes of utf-8
-                            MAX_WRITE = 32 * 1024 // 4
-                            try:
-                                if len(text) <= MAX_WRITE:
-                                    write(text)
-                                else:
-                                    batch: List[str] = []
-                                    batch_append = batch.append
-                                    size = 0
-                                    for line in text.splitlines(True):
-                                        if size + len(line) > MAX_WRITE and batch:
-                                            write("".join(batch))
-                                            batch.clear()
-                                            size = 0
-                                        batch_append(line)
-                                        size += len(line)
-                                    if batch:
-                                        write("".join(batch))
-                                        batch.clear()
-                            except UnicodeEncodeError as error:
-                                error.reason = f"{error.reason}\n*** You may need to add PYTHONIOENCODING=utf-8 to your environment ***"
-                                raise
-                    else:
-                        text = self._render_buffer(self._buffer[:])
-                        try:
-                            self.file.write(text)
-                        except UnicodeEncodeError as error:
-                            error.reason = f"{error.reason}\n*** You may need to add PYTHONIOENCODING=utf-8 to your environment ***"
-                            raise
-
-                    self.file.flush()
-                    del self._buffer[:]
+        pass
 
     def _render_buffer(self, buffer: Iterable[Segment]) -> str:
         """Render buffered output, and clear buffer."""
-        output: List[str] = []
-        append = output.append
-        color_system = self._color_system
-        legacy_windows = self.legacy_windows
-        not_terminal = not self.is_terminal
-        if self.no_color and color_system:
-            buffer = Segment.remove_color(buffer)
-        for text, style, control in buffer:
-            if style:
-                append(
-                    style.render(
-                        text,
-                        color_system=color_system,
-                        legacy_windows=legacy_windows,
-                    )
-                )
-            elif not (not_terminal and control):
-                append(text)
-
-        rendered = "".join(output)
-        return rendered
+        pass
 
     def input(
         self,
@@ -2176,18 +1822,7 @@ class Console:
         Returns:
             str: Text read from stdin.
         """
-        if prompt:
-            self.print(prompt, markup=markup, emoji=emoji, end="")
-        if password:
-            import getpass as _getpass_mod
-
-            result = _getpass_mod.getpass("", stream=stream)
-        else:
-            if stream:
-                result = stream.readline()
-            else:
-                result = input()
-        return result
+        pass
 
     def export_text(self, *, clear: bool = True, styles: bool = False) -> str:
         """Generate text from console contents (requires record=True argument in constructor).
@@ -2201,25 +1836,7 @@ class Console:
             str: String containing console contents.
 
         """
-        assert (
-            self.record
-        ), "To export console contents set record=True in the constructor or instance"
-
-        with self._record_buffer_lock:
-            if styles:
-                text = "".join(
-                    (style.render(text) if style else text)
-                    for text, style, _ in self._record_buffer
-                )
-            else:
-                text = "".join(
-                    segment.text
-                    for segment in self._record_buffer
-                    if not segment.control
-                )
-            if clear:
-                del self._record_buffer[:]
-        return text
+        pass
 
     def save_text(
         self,
@@ -2237,9 +1854,7 @@ class Console:
                 Defaults to ``False``.
 
         """
-        text = self.export_text(clear=clear, styles=styles)
-        with open(path, "w", encoding="utf-8") as write_file:
-            write_file.write(text)
+        pass
 
     def export_html(
         self,
@@ -2375,233 +1990,7 @@ class Console:
             unique_id (str, optional): unique id that is used as the prefix for various elements (CSS styles, node
                 ids). If not set, this defaults to a computed value based on the recorded content.
         """
-
-        import zlib
-        from html import escape
-
-        from rich.cells import cell_len
-
-        style_cache: Dict[Style, str] = {}
-
-        def get_svg_style(style: Style) -> str:
-            """Convert a Style to CSS rules for SVG."""
-            if style in style_cache:
-                return style_cache[style]
-            css_rules = []
-            color = (
-                _theme.foreground_color
-                if (style.color is None or style.color.is_default)
-                else style.color.get_truecolor(_theme)
-            )
-            bgcolor = (
-                _theme.background_color
-                if (style.bgcolor is None or style.bgcolor.is_default)
-                else style.bgcolor.get_truecolor(_theme)
-            )
-            if style.reverse:
-                color, bgcolor = bgcolor, color
-            if style.dim:
-                color = blend_rgb(color, bgcolor, 0.4)
-            css_rules.append(f"fill: {color.hex}")
-            if style.bold:
-                css_rules.append("font-weight: bold")
-            if style.italic:
-                css_rules.append("font-style: italic;")
-            if style.underline:
-                css_rules.append("text-decoration: underline;")
-            if style.strike:
-                css_rules.append("text-decoration: line-through;")
-
-            css = ";".join(css_rules)
-            style_cache[style] = css
-            return css
-
-        _theme = theme or SVG_EXPORT_THEME
-
-        width = self.width
-        char_height = 20
-        char_width = char_height * font_aspect_ratio
-        line_height = char_height * 1.22
-
-        margin_top = 1
-        margin_right = 1
-        margin_bottom = 1
-        margin_left = 1
-
-        padding_top = 40
-        padding_right = 8
-        padding_bottom = 8
-        padding_left = 8
-
-        padding_width = padding_left + padding_right
-        padding_height = padding_top + padding_bottom
-        margin_width = margin_left + margin_right
-        margin_height = margin_top + margin_bottom
-
-        text_backgrounds: List[str] = []
-        text_group: List[str] = []
-        classes: Dict[str, int] = {}
-        style_no = 1
-
-        def escape_text(text: str) -> str:
-            """HTML escape text and replace spaces with nbsp."""
-            return escape(text).replace(" ", "&#160;")
-
-        def make_tag(
-            name: str, content: Optional[str] = None, **attribs: object
-        ) -> str:
-            """Make a tag from name, content, and attributes."""
-
-            def stringify(value: object) -> str:
-                if isinstance(value, (float)):
-                    return format(value, "g")
-                return str(value)
-
-            tag_attribs = " ".join(
-                f'{k.lstrip("_").replace("_", "-")}="{stringify(v)}"'
-                for k, v in attribs.items()
-            )
-            return (
-                f"<{name} {tag_attribs}>{content}</{name}>"
-                if content
-                else f"<{name} {tag_attribs}/>"
-            )
-
-        with self._record_buffer_lock:
-            segments = list(Segment.filter_control(self._record_buffer))
-            if clear:
-                self._record_buffer.clear()
-
-        if unique_id is None:
-            unique_id = "terminal-" + str(
-                zlib.adler32(
-                    ("".join(repr(segment) for segment in segments)).encode(
-                        "utf-8",
-                        "ignore",
-                    )
-                    + title.encode("utf-8", "ignore")
-                )
-            )
-        y = 0
-        for y, line in enumerate(Segment.split_and_crop_lines(segments, length=width)):
-            x = 0
-            for text, style, _control in line:
-                style = style or Style()
-                rules = get_svg_style(style)
-                if rules not in classes:
-                    classes[rules] = style_no
-                    style_no += 1
-                class_name = f"r{classes[rules]}"
-
-                if style.reverse:
-                    has_background = True
-                    background = (
-                        _theme.foreground_color.hex
-                        if style.color is None
-                        else style.color.get_truecolor(_theme).hex
-                    )
-                else:
-                    bgcolor = style.bgcolor
-                    has_background = bgcolor is not None and not bgcolor.is_default
-                    background = (
-                        _theme.background_color.hex
-                        if style.bgcolor is None
-                        else style.bgcolor.get_truecolor(_theme).hex
-                    )
-
-                text_length = cell_len(text)
-                if has_background:
-                    text_backgrounds.append(
-                        make_tag(
-                            "rect",
-                            fill=background,
-                            x=x * char_width,
-                            y=y * line_height + 1.5,
-                            width=char_width * text_length,
-                            height=line_height + 0.25,
-                            shape_rendering="crispEdges",
-                        )
-                    )
-
-                if text != " " * len(text):
-                    text_group.append(
-                        make_tag(
-                            "text",
-                            escape_text(text),
-                            _class=f"{unique_id}-{class_name}",
-                            x=x * char_width,
-                            y=y * line_height + char_height,
-                            textLength=char_width * len(text),
-                            clip_path=f"url(#{unique_id}-line-{y})",
-                        )
-                    )
-                x += cell_len(text)
-
-        line_offsets = [line_no * line_height + 1.5 for line_no in range(y)]
-        lines = "\n".join(
-            f"""<clipPath id="{unique_id}-line-{line_no}">
-    {make_tag("rect", x=0, y=offset, width=char_width * width, height=line_height + 0.25)}
-            </clipPath>"""
-            for line_no, offset in enumerate(line_offsets)
-        )
-
-        styles = "\n".join(
-            f".{unique_id}-r{rule_no} {{ {css} }}" for css, rule_no in classes.items()
-        )
-        backgrounds = "".join(text_backgrounds)
-        matrix = "".join(text_group)
-
-        terminal_width = ceil(width * char_width + padding_width)
-        terminal_height = (y + 1) * line_height + padding_height
-        chrome = make_tag(
-            "rect",
-            fill=_theme.background_color.hex,
-            stroke="rgba(255,255,255,0.35)",
-            stroke_width="1",
-            x=margin_left,
-            y=margin_top,
-            width=terminal_width,
-            height=terminal_height,
-            rx=8,
-        )
-
-        title_color = _theme.foreground_color.hex
-        if title:
-            chrome += make_tag(
-                "text",
-                escape_text(title),
-                _class=f"{unique_id}-title",
-                fill=title_color,
-                text_anchor="middle",
-                x=terminal_width // 2,
-                y=margin_top + char_height + 6,
-            )
-        chrome += f"""
-            <g transform="translate(26,22)">
-            <circle cx="0" cy="0" r="7" fill="#ff5f57"/>
-            <circle cx="22" cy="0" r="7" fill="#febc2e"/>
-            <circle cx="44" cy="0" r="7" fill="#28c840"/>
-            </g>
-        """
-
-        svg = code_format.format(
-            unique_id=unique_id,
-            char_width=char_width,
-            char_height=char_height,
-            line_height=line_height,
-            terminal_width=char_width * width - 1,
-            terminal_height=(y + 1) * line_height - 1,
-            width=terminal_width + margin_width,
-            height=terminal_height + margin_height,
-            terminal_x=margin_left + padding_left,
-            terminal_y=margin_top + padding_top,
-            styles=styles,
-            chrome=chrome,
-            backgrounds=backgrounds,
-            matrix=matrix,
-            lines=lines,
-        )
-        return svg
+        pass
 
     def save_svg(
         self,
@@ -2630,16 +2019,7 @@ class Console:
             unique_id (str, optional): unique id that is used as the prefix for various elements (CSS styles, node
                 ids). If not set, this defaults to a computed value based on the recorded content.
         """
-        svg = self.export_svg(
-            title=title,
-            theme=theme,
-            clear=clear,
-            code_format=code_format,
-            font_aspect_ratio=font_aspect_ratio,
-            unique_id=unique_id,
-        )
-        with open(path, "w", encoding="utf-8") as write_file:
-            write_file.write(svg)
+        pass
 
 
 if __name__ == "__main__":  # pragma: no cover

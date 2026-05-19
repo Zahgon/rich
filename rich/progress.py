@@ -73,19 +73,6 @@ class _TrackThread(Thread):
         self.completed = 0
         super().__init__(daemon=True)
 
-    def run(self) -> None:
-        task_id = self.task_id
-        advance = self.progress.advance
-        update_period = self.update_period
-        last_completed = 0
-        wait = self.done.wait
-        while not wait(update_period) and self.progress.live.is_started:
-            completed = self.completed
-            if last_completed != completed:
-                advance(task_id, completed - last_completed)
-                last_completed = completed
-
-        self.progress.update(self.task_id, completed=self.completed, refresh=True)
 
     def __enter__(self) -> "_TrackThread":
         self.start()
@@ -215,65 +202,26 @@ class _Reader(RawIOBase, BinaryIO):
         self.progress.advance(self.task, advance=len(line))
         return line
 
-    @property
-    def closed(self) -> bool:
-        return self._closed
 
     def fileno(self) -> int:
         return self.handle.fileno()
 
-    def isatty(self) -> bool:
-        return self.handle.isatty()
 
-    @property
-    def mode(self) -> str:
-        return self.handle.mode
 
-    @property
-    def name(self) -> str:
-        return self.handle.name
 
-    def readable(self) -> bool:
-        return self.handle.readable()
 
-    def seekable(self) -> bool:
-        return self.handle.seekable()
 
-    def writable(self) -> bool:
-        return False
 
-    def read(self, size: int = -1) -> bytes:
-        block = self.handle.read(size)
-        self.progress.advance(self.task, advance=len(block))
-        return block
 
-    def readinto(self, b: Union[bytearray, memoryview, mmap]):  # type: ignore[no-untyped-def, override]
-        n = self.handle.readinto(b)  # type: ignore[attr-defined]
-        self.progress.advance(self.task, advance=n)
-        return n
 
-    def readline(self, size: int = -1) -> bytes:  # type: ignore[override]
-        line = self.handle.readline(size)
-        self.progress.advance(self.task, advance=len(line))
-        return line
 
-    def readlines(self, hint: int = -1) -> List[bytes]:
-        lines = self.handle.readlines(hint)
-        self.progress.advance(self.task, advance=sum(map(len, lines)))
-        return lines
 
     def close(self) -> None:
         if self.close_handle:
             self.handle.close()
         self._closed = True
 
-    def seek(self, offset: int, whence: int = 0) -> int:
-        pos = self.handle.seek(offset, whence)
-        self.progress.update(self.task, completed=pos)
-        return pos
 
-    def tell(self) -> int:
-        return self.handle.tell()
 
     def write(self, s: Any) -> int:
         raise UnsupportedOperation("write")
@@ -338,34 +286,7 @@ def wrap_file(
         ContextManager[BinaryIO]: A context manager yielding a progress reader.
 
     """
-
-    columns: List["ProgressColumn"] = (
-        [TextColumn("[progress.description]{task.description}")] if description else []
-    )
-    columns.extend(
-        (
-            BarColumn(
-                style=style,
-                complete_style=complete_style,
-                finished_style=finished_style,
-                pulse_style=pulse_style,
-            ),
-            DownloadColumn(),
-            TimeRemainingColumn(),
-        )
-    )
-    progress = Progress(
-        *columns,
-        auto_refresh=auto_refresh,
-        console=console,
-        transient=transient,
-        get_time=get_time,
-        refresh_per_second=refresh_per_second or 10,
-        disable=disable,
-    )
-
-    reader = progress.wrap_file(file, total=total, description=description)
-    return _ReadContext(progress, reader)
+    pass
 
 
 @typing.overload
@@ -465,43 +386,7 @@ def open(
         ContextManager[BinaryIO]: A context manager yielding a progress reader.
 
     """
-
-    columns: List["ProgressColumn"] = (
-        [TextColumn("[progress.description]{task.description}")] if description else []
-    )
-    columns.extend(
-        (
-            BarColumn(
-                style=style,
-                complete_style=complete_style,
-                finished_style=finished_style,
-                pulse_style=pulse_style,
-            ),
-            DownloadColumn(),
-            TimeRemainingColumn(),
-        )
-    )
-    progress = Progress(
-        *columns,
-        auto_refresh=auto_refresh,
-        console=console,
-        transient=transient,
-        get_time=get_time,
-        refresh_per_second=refresh_per_second or 10,
-        disable=disable,
-    )
-
-    reader = progress.open(
-        file,
-        mode=mode,
-        buffering=buffering,
-        encoding=encoding,
-        errors=errors,
-        newline=newline,
-        total=total,
-        description=description,
-    )
-    return _ReadContext(progress, reader)  # type: ignore[return-value, type-var]
+    pass
 
 
 class ProgressColumn(ABC):
@@ -602,7 +487,7 @@ class SpinnerColumn(ProgressColumn):
             spinner_style (Optional[StyleType], optional): Spinner style. Defaults to "progress.spinner".
             speed (float, optional): Speed factor of spinner. Defaults to 1.0.
         """
-        self.spinner = Spinner(spinner_name, style=spinner_style, speed=speed)
+        pass
 
     def render(self, task: "Task") -> RenderableType:
         text = (
@@ -987,69 +872,37 @@ class Task:
     @property
     def started(self) -> bool:
         """bool: Check if the task as started."""
-        return self.start_time is not None
+        pass
 
     @property
     def remaining(self) -> Optional[float]:
         """Optional[float]: Get the number of steps remaining, if a non-None total was set."""
-        if self.total is None:
-            return None
-        return self.total - self.completed
+        pass
 
     @property
     def elapsed(self) -> Optional[float]:
         """Optional[float]: Time elapsed since task was started, or ``None`` if the task hasn't started."""
-        if self.start_time is None:
-            return None
-        if self.stop_time is not None:
-            return self.stop_time - self.start_time
-        return self.get_time() - self.start_time
+        pass
 
     @property
     def finished(self) -> bool:
         """Check if the task has finished."""
-        return self.finished_time is not None
+        pass
 
     @property
     def percentage(self) -> float:
         """float: Get progress of task as a percentage. If a None total was set, returns 0"""
-        if not self.total:
-            return 0.0
-        completed = (self.completed / self.total) * 100.0
-        completed = min(100.0, max(0.0, completed))
-        return completed
+        pass
 
     @property
     def speed(self) -> Optional[float]:
         """Optional[float]: Get the estimated speed in steps per second."""
-        if self.start_time is None:
-            return None
-        with self._lock:
-            progress = self._progress
-            if not progress:
-                return None
-            total_time = progress[-1].timestamp - progress[0].timestamp
-            if total_time == 0:
-                return None
-            iter_progress = iter(progress)
-            next(iter_progress)
-            total_completed = sum(sample.completed for sample in iter_progress)
-            speed = total_completed / total_time
-            return speed
+        pass
 
     @property
     def time_remaining(self) -> Optional[float]:
         """Optional[float]: Get estimated time to completion, or ``None`` if no data."""
-        if self.finished:
-            return 0.0
-        speed = self.speed
-        if not speed:
-            return None
-        remaining = self.remaining
-        if remaining is None:
-            return None
-        estimate = ceil(remaining / speed)
-        return estimate
+        pass
 
     def _reset(self) -> None:
         """Reset progress."""
@@ -1134,36 +987,23 @@ class Progress(JupyterMixin):
         a spinner to the left, the default columns, and a labeled elapsed
         time column.
         """
-        return (
-            TextColumn("[progress.description]{task.description}"),
-            BarColumn(),
-            TaskProgressColumn(),
-            TimeRemainingColumn(),
-        )
+        pass
 
-    @property
-    def console(self) -> Console:
-        return self.live.console
 
     @property
     def tasks(self) -> List[Task]:
         """Get a list of Task instances."""
-        with self._lock:
-            return list(self._tasks.values())
+        pass
 
     @property
     def task_ids(self) -> List[TaskID]:
         """A list of task IDs."""
-        with self._lock:
-            return list(self._tasks.keys())
+        pass
 
     @property
     def finished(self) -> bool:
         """Check if all tasks have been completed."""
-        with self._lock:
-            if not self._tasks:
-                return True
-            return all(task.finished for task in self._tasks.values())
+        pass
 
     def start(self) -> None:
         """Start the progress display."""
@@ -1256,25 +1096,7 @@ class Progress(JupyterMixin):
         Raises:
             ValueError: When no total value can be extracted from the arguments or the task.
         """
-        # attempt to recover the total from the task
-        total_bytes: Optional[float] = None
-        if total is not None:
-            total_bytes = total
-        elif task_id is not None:
-            with self._lock:
-                total_bytes = self._tasks[task_id].total
-        if total_bytes is None:
-            raise ValueError(
-                f"unable to get the total number of bytes, please specify 'total'"
-            )
-
-        # update total of task or create new task
-        if task_id is None:
-            task_id = self.add_task(description, total=total_bytes)
-        else:
-            self.update(task_id, total=total_bytes)
-
-        return _Reader(file, self, task_id, close_handle=False)
+        pass
 
     @typing.overload
     def open(
@@ -1340,50 +1162,7 @@ class Progress(JupyterMixin):
         Raises:
             ValueError: When an invalid mode is given.
         """
-        # normalize the mode (always rb, rt)
-        _mode = "".join(sorted(mode, reverse=False))
-        if _mode not in ("br", "rt", "r"):
-            raise ValueError(f"invalid mode {mode!r}")
-
-        # patch buffering to provide the same behaviour as the builtin `open`
-        line_buffering = buffering == 1
-        if _mode == "br" and buffering == 1:
-            warnings.warn(
-                "line buffering (buffering=1) isn't supported in binary mode, the default buffer size will be used",
-                RuntimeWarning,
-            )
-            buffering = -1
-        elif _mode in ("rt", "r"):
-            if buffering == 0:
-                raise ValueError("can't have unbuffered text I/O")
-            elif buffering == 1:
-                buffering = -1
-
-        # attempt to get the total with `os.stat`
-        if total is None:
-            total = stat(file).st_size
-
-        # update total of task or create new task
-        if task_id is None:
-            task_id = self.add_task(description, total=total)
-        else:
-            self.update(task_id, total=total)
-
-        # open the file in binary mode,
-        handle = io.open(file, "rb", buffering=buffering)
-        reader = _Reader(handle, self, task_id, close_handle=True)
-
-        # wrap the reader in a `TextIOWrapper` if text mode
-        if mode in ("r", "rt"):
-            return io.TextIOWrapper(
-                reader,
-                encoding=encoding,
-                errors=errors,
-                newline=newline,
-                line_buffering=line_buffering,
-            )
-
-        return reader
+        pass
 
     def start_task(self, task_id: TaskID) -> None:
         """Start a task.
@@ -1497,22 +1276,7 @@ class Progress(JupyterMixin):
             description (str, optional): Change task description if not None. Defaults to None.
             **fields (str): Additional data fields required for rendering.
         """
-        current_time = self.get_time()
-        with self._lock:
-            task = self._tasks[task_id]
-            task._reset()
-            task.start_time = current_time if start else None
-            if total is not None:
-                task.total = total
-            task.completed = completed
-            if visible is not None:
-                task.visible = visible
-            if fields:
-                task.fields = fields
-            if description is not None:
-                task.description = description
-            task.finished_time = None
-        self.refresh()
+        pass
 
     def advance(self, task_id: TaskID, advance: float = 1) -> None:
         """Advance task by a number of steps.

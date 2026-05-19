@@ -63,13 +63,7 @@ class Inspect(JupyterMixin):
 
     def _make_title(self, obj: Any) -> Text:
         """Make a default title."""
-        title_str = (
-            str(obj)
-            if (isclass(obj) or callable(obj) or ismodule(obj))
-            else str(type(obj))
-        )
-        title_text = self.highlighter(title_str)
-        return title_text
+        pass
 
     def __rich__(self) -> Panel:
         return Panel.fit(
@@ -125,9 +119,6 @@ class Inspect(JupyterMixin):
     def _render(self) -> Iterable[RenderableType]:
         """Render object."""
 
-        def sort_items(item: Tuple[str, Any]) -> Tuple[bool, str]:
-            key, (_error, value) = item
-            return (callable(value), key.strip("_").lower())
 
         def safe_getattr(attr_name: str) -> Tuple[Any, Any]:
             """Get attribute or any exception."""

@@ -125,7 +125,7 @@ class Column:
     @property
     def flexible(self) -> bool:
         """Check if this column is flexible."""
-        return self.ratio is not None
+        pass
 
 
 @dataclass
@@ -295,17 +295,12 @@ class Table(JupyterMixin):
     @property
     def _extra_width(self) -> int:
         """Get extra width to add to cell content."""
-        width = 0
-        if self.box and self.show_edge:
-            width += 2
-        if self.box:
-            width += len(self.columns) - 1
-        return width
+        pass
 
     @property
     def row_count(self) -> int:
         """Get the current number of rows."""
-        return len(self.rows)
+        pass
 
     def get_row_style(self, console: "Console", index: int) -> StyleType:
         """Get the current row style."""
@@ -353,13 +348,12 @@ class Table(JupyterMixin):
     @property
     def padding(self) -> Tuple[int, int, int, int]:
         """Get cell padding."""
-        return self._padding
+        pass
 
     @padding.setter
     def padding(self, padding: PaddingDimensions) -> "Table":
         """Set cell padding."""
-        self._padding = Padding.unpack(padding)
-        return self
+        pass
 
     def add_column(
         self,
@@ -468,9 +462,7 @@ class Table(JupyterMixin):
 
     def add_section(self) -> None:
         """Add a new section (draw a line after current row)."""
-
-        if self.rows:
-            self.rows[-1].end_section = True
+        pass
 
     def __rich_console__(
         self, console: "Console", options: "ConsoleOptions"
@@ -973,10 +965,6 @@ if __name__ == "__main__":  # pragma: no cover
             "$1,332,439,889",
         )
 
-        def header(text: str) -> None:
-            console.print()
-            console.rule(highlight(text))
-            console.print()
 
         console = Console()
         highlight = ReprHighlighter()
